@@ -63,39 +63,6 @@ services:
     networks:
       - kafka-network
 
-  # kafka-connect:
-  #   image: confluentinc/cp-kafka-connect:7.3.2
-  #   ports:
-  #     - "8083:8083"
-  #   environment:
-  #     CONNECT_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19093,kafka3:19094
-  #     CONNECT_REST_PORT: 8083
-  #     CONNECT_GROUP_ID: compose-connect-group
-  #     CONNECT_CONFIG_STORAGE_TOPIC: compose-connect-configs
-  #     CONNECT_OFFSET_STORAGE_TOPIC: compose-connect-offsets
-  #     CONNECT_STATUS_STORAGE_TOPIC: compose-connect-status
-  #     CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-  #     CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-  #     CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-  #     CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
-  #     CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
-  #     CONNECT_LOG4J_ROOT_LOGLEVEL: "INFO"
-  #     CONNECT_LOG4J_LOGGERS: "org.apache.kafka.connect.runtime.rest=WARN,org.reflections=ERROR"
-  #     CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
-  #   networks:
-  #     - kafka-network
-
-  # schema-registry:
-  #   image: confluentinc/cp-schema-registry:7.3.2
-  #   ports:
-  #     - "8081:8081"
-  #   environment:
-  #     SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka1:19092,kafka2:19093,kafka3:19094
-  #     SCHEMA_REGISTRY_HOST_NAME: schema-registry
-  #     SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-  #   networks:
-  #     - kafka-network
-
   kafka-ui:
     container_name: kafka-ui
     image: provectuslabs/kafka-ui:latest
