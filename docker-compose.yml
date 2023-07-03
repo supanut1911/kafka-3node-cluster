@@ -1,86 +1,94 @@
-version: "3"
+version: "2"
 
 services:
-  zoo1:
-    image: confluentinc/cp-zookeeper:7.3.2
+  zookeeper:
+    image: "docker.io/bitnami/zookeeper:3-debian-10"
     ports:
       - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+    volumes:
+      - "./data/zookeeper:/bitnami"
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_SERVERS: zoo1:2888:3888
-    networks:
-      - kafka-network
-
-  kafka1:
-    image: confluentinc/cp-kafka:7.3.2
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVER_ID=1
+      - ZOO_SERVERS=0.0.0.0:2888:3888
+  kafka:
+    image: "docker.io/bitnami/kafka:2-debian-10"
     ports:
       - "9092:9092"
-      - "29092:29092"
+    volumes:
+      - "./data/kafka:/bitnami/kafka"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092,DOCKER://host.docker.internal:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
-      KAFKA_BROKER_ID: 1
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-    networks:
-      - kafka-network
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_NUM_PARTITIONS=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL://{{EC2_INSTANCE_PUBLIC_DNS}}:9092
+      - KAFKA_INTER_BROKER_LISTENER_NAME=EXTERNAL
+    depends_on:
+      - zookeeper
 
   kafka2:
-    image: confluentinc/cp-kafka:7.3.2
+    image: "docker.io/bitnami/kafka:2-debian-10"
     ports:
       - "9093:9093"
-      - "29093:29093"
+    volumes:
+      - "./data/kafka:/bitnami/kafka2"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka2:19093,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093,DOCKER://host.docker.internal:29093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
-      KAFKA_BROKER_ID: 2
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-    networks:
-      - kafka-network
+      - KAFKA_BROKER_ID=2		
+			- KAFKA_BROKER_ID=2
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_NUM_PARTITIONS=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL://{{EC2_INSTANCE_PUBLIC_DNS}}:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=EXTERNAL
+    depends_on:
+      - zookeeper
 
   kafka3:
-    image: confluentinc/cp-kafka:7.3.2
+    image: "docker.io/bitnami/kafka:2-debian-10"
     ports:
       - "9094:9094"
-      - "29094:29094"
+    volumes:
+      - "./data/kafka:/bitnami/kafka3"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka3:19094,EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9094,DOCKER://host.docker.internal:29094
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
-      KAFKA_BROKER_ID: 3
-      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-    networks:
-      - kafka-network
+      - KAFKA_BROKER_ID=3
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_NUM_PARTITIONS=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=EXTERNAL://{{EC2_INSTANCE_PUBLIC_DNS}}:9094
+      - KAFKA_INTER_BROKER_LISTENER_NAME=EXTERNAL
+    depends_on:
+      - zookeeper
 
   kafka-ui:
     container_name: kafka-ui
-    image: provectuslabs/kafka-ui:latest
+    image: "provectuslabs/kafka-ui:latest"
     ports:
-      - 8888:8080 # Changed to avoid port clash with akhq
+      - "8888:8080" # Changed to avoid port clash with akhq
     depends_on:
-      - kafka1
+      - kafka
       - kafka2
       - kafka3
-      - schema-registry
-      - kafka-connect
     environment:
-      KAFKA_CLUSTERS_0_NAME: fins-dev-kafka-cluster
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:19092,kafka2:19093,kafka3:19094
-      DYNAMIC_CONFIG_ENABLED: "true"
-    networks:
-      - kafka-network
-
-networks:
-  kafka-network:
-    driver: bridge
+      - KAFKA_CLUSTERS_0_NAME=fins-dev-kafka-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092,kafka2:9093,kafka3:9094
